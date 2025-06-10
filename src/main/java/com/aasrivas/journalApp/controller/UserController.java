@@ -17,12 +17,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("getAllUsers")
+    @GetMapping("getAll")
     public List<User> getAllUsers() {
         return userService.getAll();
     }
 
-    @GetMapping("id/{id}")
+    @GetMapping("getById/{id}")
     public ResponseEntity<User> getUserById(@PathVariable ObjectId id) {
         Optional<User> byId = userService.getById(id);
         if (byId.isPresent())
@@ -32,24 +32,26 @@ public class UserController {
 
     }
 
-    @PostMapping("createUser")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("create")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
+            if(userService.findByUserName(user.getUserName())!=null)
+                    return new ResponseEntity<>("User with given username already present in system. Try different userName.",HttpStatus.NOT_ACCEPTABLE);
             userService.createUser(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-//    @PutMapping("id/{id}")
-//    public User updateUserById(@RequestBody Map<String, Object> updates,
-//                                               @PathVariable ObjectId id) {
-//        return userService.updateById(updates, id);
-//    }
+    @PutMapping("updateById/{id}")
+    public User updateUserById(@RequestBody Map<String, Object> updates,
+                                               @PathVariable ObjectId id) {
+        return userService.updateById(updates, id);
+    }
 
 
-    @DeleteMapping("id/{id}")
+    @DeleteMapping("deleteById/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable ObjectId id) {
         boolean isSuccess = userService.deleteById(id);
         if (isSuccess) return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -1,10 +1,12 @@
 package com.aasrivas.journalApp.service;
 
 import com.aasrivas.journalApp.entity.JournalEntry;
+import com.aasrivas.journalApp.entity.User;
 import com.aasrivas.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +17,17 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
-    public void createEntry(JournalEntry journalEntry) {
+    @Autowired
+    private UserService userService;
+
+    @Transactional
+    public void createEntry(JournalEntry journalEntry, String userName) {
+        User user = userService.findByUserName(userName);
+        if (user == null)
+            throw new RuntimeException("User not found");
         journalEntryRepository.save(journalEntry);
+        user.getJournalEntries().add(journalEntry);
+        userService.createUser(user);
     }
 
     public Optional<JournalEntry> getById(ObjectId id) {
@@ -27,7 +38,10 @@ public class JournalEntryService {
         return journalEntryRepository.findAll();
     }
 
-    public JournalEntry updateById(Map<String, Object> updates, ObjectId id) {
+    public void updateById(Map<String, Object> updates, ObjectId id, String userName) {
+        User user = userService.findByUserName(userName);
+        if (user == null)
+            throw new RuntimeException("User not found");
         JournalEntry existingEntry = journalEntryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry not found"));
 
@@ -39,20 +53,31 @@ public class JournalEntryService {
                 case "content":
                     existingEntry.setContent((String) value);
                     break;
-                // ignore unknown fields silently or throw exception if strict validation is needed
             }
         });
 
-        return journalEntryRepository.save(existingEntry);
+        journalEntryRepository.save(existingEntry);
     }
 
-    public boolean deleteById(ObjectId id) {
-        try {
-            journalEntryRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
+    @Transactional
+    public void deleteById(ObjectId id, String userName) {
+        User user = userService.findByUserName(userName);
+        if (user == null) {
+            throw new RuntimeException("User doesn't exist.");
         }
+        journalEntryRepository.deleteById(id);
+        List<JournalEntry> journalEntries = user.getJournalEntries();
+        boolean entryFound = false;
+        for (JournalEntry entry : journalEntries) {
+            if (entry.getId().equals(id)) {
+                user.getJournalEntries().remove(entry);
+                entryFound = true;
+                break;
+            }
+        }
+        if (!entryFound)
+            throw new RuntimeException("Journal entry with id: " + id + " doesn't exist for user: " + userName);
+        userService.createUser(user);
     }
 
 }

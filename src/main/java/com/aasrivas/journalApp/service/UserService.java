@@ -27,24 +27,23 @@ public class UserService {
         return userRepository.findAll();
     }
 
-//    public User updateById(Map<String, Object> updates, ObjectId id) {
-//        User existingUser = userRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        updates.forEach((key, value) -> {
-//            switch (key) {
-//                case "title":
-//                    existingUser.setUserName((String) value);
-//                    break;
-//                case "content":
-//                    existingUser.setPassword((String) value);
-//                    break;
-//                // ignore unknown fields silently or throw exception if strict validation is needed
-//            }
-//        });
-//
-//        return userRepository.save(existingUser);
-//    }
+    public User updateById(Map<String, Object> updates, ObjectId id) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "userName":
+                    existingUser.setUserName((String) value);
+                    break;
+                case "password":
+                    existingUser.setPassword((String) value);
+                    break;
+            }
+        });
+
+        return userRepository.save(existingUser);
+    }
 
     public boolean deleteById(ObjectId id) {
         try {
@@ -53,6 +52,10 @@ public class UserService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public User findByUserName(String userName) {
+        return userRepository.findByUserName(userName);
     }
 
 }
