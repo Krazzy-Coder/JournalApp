@@ -35,7 +35,7 @@ public class UserController {
 //    }
 
     @PutMapping("update")
-    public void updateUserById(@RequestBody Map<String, Object> updates) {
+    public void updateUser(@RequestBody Map<String, String> updates) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         userService.update(updates, userName);
@@ -43,7 +43,7 @@ public class UserController {
 
 
     @DeleteMapping("delete")
-    public void deleteUserById(@PathVariable ObjectId id) {
+    public void deleteUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         userService.delete(userName);

@@ -19,7 +19,7 @@ public class UserService {
 
     public void createUser(User user) {
         user.setRoles(Arrays.asList("USER"));
-        user.setUserName(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -31,15 +31,15 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void update(Map<String, Object> updates, String userName) {
+    public void update(Map<String, String> updates, String userName) {
         User existingUser = findByUserName(userName);
         updates.forEach((key, value) -> {
             switch (key) {
                 case "userName":
-                    existingUser.setUserName((String) value);
+                    existingUser.setUserName(value);
                     break;
                 case "password":
-                    existingUser.setPassword((String) value);
+                    existingUser.setPassword(new BCryptPasswordEncoder().encode(value));
                     break;
             }
         });
