@@ -19,12 +19,4 @@ public class JournalEntry {
     @NonNull
     private String title;
     private String content;
-
-    public void setTitle(@NonNull String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }
