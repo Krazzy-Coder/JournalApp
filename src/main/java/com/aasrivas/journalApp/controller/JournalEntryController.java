@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("journal")
-public class JournalEntryControllerV2 {
+@RequestMapping("/journal")
+public class JournalEntryController {
 
     @Autowired
     private JournalEntryService journalEntryService;

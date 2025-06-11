@@ -4,8 +4,10 @@ import com.aasrivas.journalApp.entity.User;
 import com.aasrivas.journalApp.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +18,8 @@ public class UserService {
     private UserRepository userRepository;
 
     public void createUser(User user) {
+        user.setRoles(Arrays.asList("USER"));
+        user.setUserName(new BCryptPasswordEncoder().encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -27,10 +31,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User updateById(Map<String, Object> updates, ObjectId id) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public void update(Map<String, Object> updates, String userName) {
+        User existingUser = findByUserName(userName);
         updates.forEach((key, value) -> {
             switch (key) {
                 case "userName":
@@ -42,16 +44,12 @@ public class UserService {
             }
         });
 
-        return userRepository.save(existingUser);
+        userRepository.save(existingUser);
     }
 
-    public boolean deleteById(ObjectId id) {
-        try {
-            userRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public void delete(String userName) {
+        User existingUser = findByUserName(userName);
+        userRepository.deleteById(existingUser.getId());
     }
 
     public User findByUserName(String userName) {
