@@ -27,7 +27,7 @@ public class JournalEntryService {
             throw new RuntimeException("User not found");
         journalEntryRepository.save(journalEntry);
         user.getJournalEntries().add(journalEntry);
-        userService.createUser(user);
+        userService.saveUser(user);
     }
 
     public Optional<JournalEntry> getById(ObjectId id) {
@@ -77,7 +77,7 @@ public class JournalEntryService {
         }
         if (!entryFound)
             throw new RuntimeException("Journal entry with id: " + id + " doesn't exist for user: " + userName);
-        userService.createUser(user);
+        userService.saveUser(user);
     }
 
 }
