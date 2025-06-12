@@ -36,14 +36,14 @@ public class JournalEntryService {
         return journalEntryRepository.findAll();
     }
 
-    public void updateById(Map<String, Object> updates, JournalEntry existingEntry) {
+    public void updateById(Map<String, String> updates, JournalEntry existingEntry) {
         updates.forEach((key, value) -> {
             switch (key) {
                 case "title":
-                    existingEntry.setTitle((String) value);
+                    existingEntry.setTitle(value);
                     break;
                 case "content":
-                    existingEntry.setContent((String) value);
+                    existingEntry.setContent(value);
                     break;
             }
         });

@@ -61,7 +61,7 @@ public class JournalEntryController {
     }
 
     @PutMapping("updateById/{id}")
-    public ResponseEntity<?> updateJournalEntryById(@RequestBody Map<String, Object> updates,
+    public ResponseEntity<?> updateJournalEntryById(@RequestBody Map<String, String> updates,
                                                     @PathVariable ObjectId id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
