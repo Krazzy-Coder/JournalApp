@@ -23,8 +23,6 @@ public class JournalEntryService {
     @Transactional
     public void createEntry(JournalEntry journalEntry, String userName) {
         User user = userService.findByUserName(userName);
-        if (user == null)
-            throw new RuntimeException("User not found");
         journalEntryRepository.save(journalEntry);
         user.getJournalEntries().add(journalEntry);
         userService.saveUser(user);
@@ -38,13 +36,7 @@ public class JournalEntryService {
         return journalEntryRepository.findAll();
     }
 
-    public void updateById(Map<String, Object> updates, ObjectId id, String userName) {
-        User user = userService.findByUserName(userName);
-        if (user == null)
-            throw new RuntimeException("User not found");
-        JournalEntry existingEntry = journalEntryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entry not found"));
-
+    public void updateById(Map<String, Object> updates, JournalEntry existingEntry) {
         updates.forEach((key, value) -> {
             switch (key) {
                 case "title":
@@ -62,22 +54,14 @@ public class JournalEntryService {
     @Transactional
     public void deleteById(ObjectId id, String userName) {
         User user = userService.findByUserName(userName);
-        if (user == null) {
-            throw new RuntimeException("User doesn't exist.");
-        }
         journalEntryRepository.deleteById(id);
         List<JournalEntry> journalEntries = user.getJournalEntries();
-        boolean entryFound = false;
         for (JournalEntry entry : journalEntries) {
             if (entry.getId().equals(id)) {
                 user.getJournalEntries().remove(entry);
-                entryFound = true;
                 break;
             }
         }
-        if (!entryFound)
-            throw new RuntimeException("Journal entry with id: " + id + " doesn't exist for user: " + userName);
         userService.saveUser(user);
     }
-
 }
