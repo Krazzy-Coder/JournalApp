@@ -1,4 +1,9 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://aadeshsrivastava48:JoSHlRjGpOB7pM68@cluster0.fvhmh72.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: journaldb
+      auto-index-creation: true
   profiles:
     active: prod
 
