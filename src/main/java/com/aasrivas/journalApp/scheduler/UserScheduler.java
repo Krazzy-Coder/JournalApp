@@ -23,19 +23,13 @@ public class UserScheduler {
     @Autowired
     private EmailService emailService;
 
-    @Scheduled(cron = "0 0 9 * * SUN")
+//    @Scheduled(cron = "0 0 9 * * SUN")
+    @Scheduled(cron = "0 * * * * *")
     public void fetchUsersAndSendSAMail() {
         List<User> usersForSentimentAnalysis = userRepository.getUsersForSentimentAnalysis();
         for (User user : usersForSentimentAnalysis) {
             // take all last 7 days entries join them and then send in getSentiment method
-            int sentiment = sentimentAnalysisService.getSentiment("happy");
-            String mood;
-            if (sentiment > 0)
-                mood = "good";
-            else if (sentiment < 0)
-                mood = "bad";
-            else
-                mood = "neutral";
+            String mood = sentimentAnalysisService.getSentiment("Felt anxious on Monday, happy by Friday. Spent time with friends, but also stressed.");
             emailService.sendEmail(user.getEmail(), "Sentiment for last 7 days", mood);
         }
     }

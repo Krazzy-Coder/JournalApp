@@ -17,3 +17,8 @@ spring:
   redis:
     host: localhost
     port: 6379
+
+genai:
+  api:
+    url: https://genaiapp-wywr.onrender.com/analyze-journals
+    key: supersecret123
