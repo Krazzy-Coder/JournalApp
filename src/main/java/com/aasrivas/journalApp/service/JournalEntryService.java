@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Component
 public class JournalEntryService {
@@ -23,6 +22,7 @@ public class JournalEntryService {
     @Transactional
     public void createEntry(JournalEntry journalEntry, String userName) {
         User user = userService.findByUserName(userName);
+        journalEntry.setDate(LocalDateTime.now());
         journalEntryRepository.save(journalEntry);
         user.getJournalEntries().add(journalEntry);
         userService.saveUser(user);
